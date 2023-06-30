@@ -1,13 +1,17 @@
 import React from "react";
+import { connect } from 'react-redux';
+import { removeFromCart } from '../../utils/actions';
 
-// The ...props means, spread all of the passed props onto this element
-// That way we don't have to define them all individually
-function DeleteBtn(props) {
+function DeleteBtn({ removeFromCart, ...props }) {
+  const handleClick = () => {
+    removeFromCart(props.item);
+  };
+
   return (
-    <span {...props} role="button" tabIndex="0">
+    <span onClick={handleClick} role="button" tabIndex="0">
       ✗
     </span>
   );
 }
 
-export default DeleteBtn;
+export default connect(null, { removeFromCart })(DeleteBtn);
