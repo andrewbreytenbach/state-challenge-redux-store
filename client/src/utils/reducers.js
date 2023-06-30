@@ -1,4 +1,5 @@
-import { useReducer } from 'react';
+import { combineReducers } from 'redux';
+
 import {
   UPDATE_PRODUCTS,
   ADD_TO_CART,
@@ -11,29 +12,44 @@ import {
   TOGGLE_CART,
 } from './actions';
 
+// Initial state for products
+const initialProductsState = {
+  products: []
+};
 
-export const reducer = (state, action) => {
+// Reducer for products
+const productsReducer = (state = initialProductsState, action) => {
   switch (action.type) {
-    
     case UPDATE_PRODUCTS:
       return {
         ...state,
         products: [...action.products],
       };
+    default:
+      return state;
+  }
+};
 
+// Initial state for cart
+const initialCartState = {
+  cartOpen: false,
+  cart: []
+};
+
+// Reducer for cart
+const cartReducer = (state = initialCartState, action) => {
+  switch (action.type) {
     case ADD_TO_CART:
       return {
         ...state,
         cartOpen: true,
         cart: [...state.cart, action.product],
       };
-
     case ADD_MULTIPLE_TO_CART:
       return {
         ...state,
         cart: [...state.cart, ...action.products],
       };
-    
     case UPDATE_CART_QUANTITY:
       return {
         ...state,
@@ -45,8 +61,6 @@ export const reducer = (state, action) => {
           return product;
         }),
       };
-
-  
     case REMOVE_FROM_CART:
       let newState = state.cart.filter((product) => {
         return product._id !== action._id;
@@ -57,38 +71,51 @@ export const reducer = (state, action) => {
         cartOpen: newState.length > 0,
         cart: newState,
       };
-
     case CLEAR_CART:
       return {
         ...state,
         cartOpen: false,
         cart: [],
       };
-
     case TOGGLE_CART:
       return {
         ...state,
         cartOpen: !state.cartOpen,
       };
-
-    case UPDATE_CATEGORIES:
-      return {
-        ...state,
-        categories: [...action.categories],
-      };
-
-    case UPDATE_CURRENT_CATEGORY:
-      return {
-        ...state,
-        currentCategory: action.currentCategory,
-      };
-
-  
     default:
       return state;
   }
 };
 
-export function useProductReducer(initialState) {
-  return useReducer(reducer, initialState);
-}
+// Initial state for categories
+const initialCategoriesState = {
+  categories: [],
+  currentCategory: ''
+};
+
+// Reducer for categories
+const categoriesReducer = (state = initialCategoriesState, action) => {
+  switch (action.type) {
+    case UPDATE_CATEGORIES:
+      return {
+        ...state,
+        categories: [...action.categories],
+      };
+    case UPDATE_CURRENT_CATEGORY:
+      return {
+        ...state,
+        currentCategory: action.currentCategory,
+      };
+    default:
+      return state;
+  }
+};
+
+// Combine multiple reducers into a single root reducer
+const rootReducer = combineReducers({
+  products: productsReducer,
+  cart: cartReducer,
+  categories: categoriesReducer
+});
+
+export default rootReducer;
